@@ -1,0 +1,227 @@
+# Author: Hazem Nasser
+# Date:10/3/2022
+# From Faculty of Computer Science and Artificial Intelligence Cairo University
+# Connect four Game With GUI
+
+# The libraries I am going to need in the programme
+import pygame
+import sys
+
+pygame.init()
+screen = pygame.display.set_mode((700, 600))
+pygame.display.set_caption('Connect 4')
+grey = (160, 160, 160)
+screen.fill(grey)
+black = (0, 0, 0)
+width = 100
+height = 100
+counter = 1
+
+
+# The function which is responsible to controls the screen coordinates
+def display_board(height, width, screen):
+    for i in range(0, 7):
+        pygame.draw.line(screen, black, (0, height), (700, height))
+        height += 100
+    for j in range(0, 8):
+        pygame.draw.line(screen, black, (width, 0), (width, 600))
+        width += 100
+
+
+board = [
+    ["-", "-", "-", "-", "-", "-", "-"],
+    ["-", "-", "-", "-", "-", "-", "-"],
+    ["-", "-", "-", "-", "-", "-", "-"],
+    ["-", "-", "-", "-", "-", "-", "-"],
+    ["-", "-", "-", "-", "-", "-", "-"],
+    ["-", "-", "-", "-", "-", "-", "-"]
+]
+turn = True
+
+
+# The cycles in the game
+def circle(x, height, turn):
+    x = ((x + 1) * 100) - 50
+
+    if turn:
+        return pygame.draw.circle(screen, (255, 0, 0), (x, height), 30)
+    else:
+        return pygame.draw.circle(screen, (0, 255, 0), (x, height), 30)
+
+
+# Drawing board in console
+def draw_board(board):
+    for row in board:
+        for column in row:
+            print(column, end="  ")
+        print()
+
+
+# Redraw the board when any action is done
+def update(board, num_of_column):
+    global turn
+    height = 550
+    for row in range(5, -1, -1):
+        if board[0][num_of_column] != "-":
+            turn = not turn
+            break
+        if board[row][num_of_column] != "-":
+            height -= 100
+            continue
+        else:
+            if turn:
+                circle(num_of_column, height, turn)
+                board[row][num_of_column] = "x"
+                break
+            else:
+                circle(num_of_column, height, turn)
+                board[row][num_of_column] = "o"
+                break
+
+
+# Checking the win in row
+def check_row(board):
+    for row in range(6):
+        for column in range(4):
+            check = []
+            if board[row][column] == "x" or board[row][column] == "o":
+                check.append(board[row][column])
+                x = (row * 100) + 50
+                y = ((column + 1) * 100) - 50
+                for c in range(column + 1, column + 4):
+                    check.append(board[row][c])
+                    end_y = ((c + 1) * 100) - 50
+                if check == ["x", "x", "x", "x"]:
+                    pygame.draw.line(screen, (0, 0, 0), (y, x), (end_y, x), 10)
+                    pygame.display.update()
+                    print("player 1 wins")
+                    return True
+                elif check == ["o", "o", "o", "o"]:
+                    pygame.draw.line(screen, (0, 0, 0), (y, x), (end_y, x), 10)
+                    pygame.display.update()
+                    print("player 2 wins")
+                    return True
+
+
+# Checking win in column
+def check_column(board):
+    for column in range(7):
+        for row in range(3):
+            check = []
+            if board[row][column] == "x" or board[row][column] == "o":
+                check.append(board[row][column])
+                x = (row * 100) + 50
+                y = ((column + 1) * 100) - 50
+                for r in range(row + 1, row + 4):
+                    check.append(board[r][column])
+                    end_x = (r * 100) + 50
+                if check == ["x", "x", "x", "x"]:
+                    pygame.draw.line(screen, (0, 0, 0), (y, x), (y, end_x), 10)
+                    pygame.display.update()
+                    print("player 1 wins")
+                    return True
+                elif check == ["o", "o", "o", "o"]:
+                    pygame.draw.line(screen, (0, 0, 0), (y, x), (y, end_x), 10)
+                    pygame.display.update()
+                    print("player 2 wins")
+                    return True
+
+
+# Checking win diagonally
+def check_diagonal(board):
+    for row in range(3):
+        for column in range(4):
+            check = []
+            if board[row][column] == "x" or board[row][column] == "o":
+                check.append(board[row][column])
+                x = (row * 100) + 50
+                y = ((column + 1) * 100) - 50
+                c = column
+                for r in range(row + 1, row + 4):
+                    c += 1
+                    end_x = (r * 100) + 50
+                    end_y = ((c + 1) * 100) - 50
+                    check.append(board[r][c])
+                if check == ["x", "x", "x", "x"]:
+                    pygame.draw.line(screen, (0, 0, 0), (y, x), (end_y, end_x), 10)
+                    pygame.display.update()
+                    print("player 1 wins")
+                    return True
+                elif check == ["o", "o", "o", "o"]:
+                    pygame.draw.line(screen, (0, 0, 0), (y, x), (end_y, end_x), 10)
+                    pygame.display.update()
+                    print("player 2 wins")
+                    return True
+
+    for row in range(3):
+        for column in range(3, 7):
+            check = []
+            if board[row][column] == "x" or board[row][column] == "o":
+                check.append(board[row][column])
+                x = (row * 100) + 50
+                y = ((column + 1) * 100) - 50
+                col = column
+                for Testing_Row in range(row + 1, row + 4):
+                    col -= 1
+                    end_x = (Testing_Row * 100) + 50
+                    end_y = ((col + 1) * 100) - 50
+                    check.append(board[Testing_Row][col])
+                if check == ["x", "x", "x", "x"]:
+                    pygame.draw.line(screen, (0, 0, 0), (y, x), (end_y, end_x), 10)
+                    pygame.display.update()
+                    print("player 1 wins")
+                    return True
+                elif check == ["o", "o", "o", "o"]:
+                    pygame.draw.line(screen, (0, 0, 0), (y, x), (end_y, end_x), 10)
+                    pygame.display.update()
+                    print("player 2 wins")
+                    return True
+
+
+# __MAIN_FUNCTION__
+while counter <= 42:
+    if check_diagonal(board) or check_column(board) or check_row(board):
+        pygame.time.wait(1000)
+        screen.fill((255, 102, 102))
+        if turn:
+            font = pygame.font.Font('freesansbold.ttf', 64)
+            text = font.render("player2 wins", True, (0, 255, 0), (0, 0, 255))
+            textRect = text.get_rect()
+            textRect.center = (700 // 2, 600 // 2)
+            screen.blit(text, textRect)
+            pygame.display.update()
+        else:
+            font = pygame.font.Font('freesansbold.ttf', 64)
+            text = font.render("player1 wins", True, (0, 255, 0), (0, 0, 255))
+            textRect = text.get_rect()
+            textRect.center = (700 // 2, 600 // 2)
+            screen.blit(text, textRect)
+            pygame.display.update()
+        pygame.time.wait(2000)
+        counter = 44
+    display_board(height, width, screen)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            counter += 1
+            x = event.pos[0] // 100
+            y = event.pos[1]
+            update(board, x)
+            draw_board(board)
+            turn = not turn
+        pygame.display.update()
+
+# Sound effect
+if counter == 43:
+    pygame.time.wait(500)
+    screen.fill((255, 102, 102))
+    font = pygame.font.Font('freesansbold.ttf', 64)
+    text = font.render("draw", True, (0, 255, 0), (0, 0, 255))
+    textRect = text.get_rect()
+    textRect.center = (700 // 2, 600 // 2)
+    screen.blit(text, textRect)
+    pygame.display.update()
+    pygame.time.wait(2000)
+
+pygame.quit()
